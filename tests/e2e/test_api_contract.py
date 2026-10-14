@@ -1,5 +1,4 @@
-"""Property-based API contract test: no input may cause a 5xx or a response that
-violates the published OpenAPI schema."""
+"""Property-based API contract test: no generated input may cause a 5xx."""
 
 from __future__ import annotations
 
@@ -15,11 +14,10 @@ pytestmark = pytest.mark.e2e
 
 @pytest.fixture
 def api_schema(client: TestClient) -> Any:
-    schema = schemathesis.from_dict(client.get("/openapi.json").json(), force_schema_version="30")
-    return schema
+    return schemathesis.openapi.from_dict(client.get("/openapi.json").json())
 
 
-schema = schemathesis.from_pytest_fixture("api_schema")
+schema = schemathesis.pytest.from_fixture("api_schema")
 
 
 @schema.parametrize()
@@ -31,5 +29,14 @@ schema = schemathesis.from_pytest_fixture("api_schema")
 def test_no_server_errors(case: Any, client: TestClient) -> None:
     # Header values must be transmittable over HTTP/1.1 at all.
     assume(all(str(v).isascii() for v in (case.headers or {}).values()))
-    response = client.request(**case.as_transport_kwargs(base_url=""))
+    kwargs = case.as_transport_kwargs(base_url="")
+    response = client.request(
+        kwargs["method"],
+        kwargs["url"],
+        params=kwargs.get("params"),
+        headers=kwargs.get("headers"),
+        json=kwargs.get("json"),
+        data=kwargs.get("data"),
+        content=kwargs.get("content"),
+    )
     assert response.status_code < 500, (case.method, case.path, response.text)

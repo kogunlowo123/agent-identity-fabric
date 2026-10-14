@@ -112,6 +112,10 @@ resource "azurerm_storage_account" "audit" {
   allow_nested_items_to_be_public = false
   shared_access_key_enabled       = false
   public_network_access_enabled   = false
+  network_rules {
+    default_action = "Deny"
+    bypass         = ["AzureServices"]
+  }
   blob_properties {
     versioning_enabled = true
   }
