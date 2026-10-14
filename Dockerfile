@@ -1,0 +1,32 @@
+# syntax=docker/dockerfile:1.7
+FROM python:3.12.7-slim-bookworm AS build
+COPY --from=ghcr.io/astral-sh/uv:0.5.4 /uv /usr/local/bin/uv
+ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy UV_PYTHON_DOWNLOADS=never
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends git ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+COPY pyproject.toml uv.lock README.md ./
+RUN uv sync --frozen --no-dev --no-install-project
+COPY src ./src
+RUN uv sync --frozen --no-dev --no-editable
+
+FROM python:3.12.7-slim-bookworm AS runtime
+RUN groupadd --system --gid 10001 fabric \
+ && useradd --system --uid 10001 --gid fabric --home-dir /nonexistent --shell /usr/sbin/nologin fabric \
+ && mkdir -p /var/lib/identity-fabric/audit \
+ && chown -R 10001:10001 /var/lib/identity-fabric
+WORKDIR /app
+COPY --from=build --chown=10001:10001 /app/.venv /app/.venv
+COPY --chown=10001:10001 policies ./policies
+ENV PATH="/app/.venv/bin:${PATH}" \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    FABRIC_HOST=0.0.0.0 \
+    FABRIC_PORT=8080 \
+    FABRIC_POLICY_FILE=/app/policies/agent-authorization.yaml
+USER 10001:10001
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD ["python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8080/healthz', timeout=2).status == 200 else 1)"]
+ENTRYPOINT ["python", "-m", "identity_fabric"]

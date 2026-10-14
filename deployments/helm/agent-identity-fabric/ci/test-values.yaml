@@ -1,0 +1,20 @@
+# Values used by CI to render and schema-validate the chart (helm lint,
+# helm template | kubeconform). They describe a complete, valid deployment.
+fabric:
+  trustDomain: agents.ci.internal
+  issuer: https://identity.agents.ci.internal
+  activeKid: "2026-10"
+  workloadIssuers:
+    https://oidc.eks.us-east-1.amazonaws.com/id/CI: https://oidc.eks.us-east-1.amazonaws.com/id/CI/keys
+  admin:
+    issuer: https://login.ci.internal
+    audience: agent-identity-fabric
+    jwksUrl: https://login.ci.internal/jwks
+secrets:
+  auditKeyFile: audit-2026-10.pem
+ingress:
+  enabled: true
+  className: nginx
+  host: identity.agents.ci.internal
+serviceMonitor:
+  enabled: true

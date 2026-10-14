@@ -1,0 +1,1469 @@
+{
+  "components": {
+    "schemas": {
+      "AgentList": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AgentView"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "limit",
+          "offset"
+        ],
+        "title": "AgentList",
+        "type": "object"
+      },
+      "AgentMandate": {
+        "description": "Role, mission and operating boundaries recorded at registration.",
+        "properties": {
+          "business_owner": {
+            "minLength": 3,
+            "title": "Business Owner",
+            "type": "string"
+          },
+          "disallowed_actions": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Disallowed Actions",
+            "type": "array"
+          },
+          "escalation_contact": {
+            "minLength": 3,
+            "title": "Escalation Contact",
+            "type": "string"
+          },
+          "mission": {
+            "maxLength": 2000,
+            "minLength": 10,
+            "title": "Mission",
+            "type": "string"
+          },
+          "protected_resources": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Protected Resources",
+            "type": "array"
+          },
+          "technical_owner": {
+            "minLength": 3,
+            "title": "Technical Owner",
+            "type": "string"
+          }
+        },
+        "required": [
+          "mission",
+          "business_owner",
+          "technical_owner",
+          "escalation_contact"
+        ],
+        "title": "AgentMandate",
+        "type": "object"
+      },
+      "AgentStatus": {
+        "enum": [
+          "pending",
+          "active",
+          "suspended",
+          "revoked"
+        ],
+        "title": "AgentStatus",
+        "type": "string"
+      },
+      "AgentView": {
+        "properties": {
+          "agent_id": {
+            "title": "Agent Id",
+            "type": "string"
+          },
+          "attested_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attested At"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "mandate": {
+            "$ref": "#/components/schemas/AgentMandate"
+          },
+          "max_classification": {
+            "title": "Max Classification",
+            "type": "integer"
+          },
+          "risk": {
+            "title": "Risk",
+            "type": "integer"
+          },
+          "scopes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Scopes",
+            "type": "array"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AgentStatus"
+          },
+          "status_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status Reason"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "workload": {
+            "$ref": "#/components/schemas/WorkloadBinding"
+          }
+        },
+        "required": [
+          "agent_id",
+          "display_name",
+          "status",
+          "scopes",
+          "risk",
+          "max_classification",
+          "mandate",
+          "workload",
+          "created_at",
+          "updated_at",
+          "attested_at",
+          "status_reason"
+        ],
+        "title": "AgentView",
+        "type": "object"
+      },
+      "AttestRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "workload_token": {
+            "minLength": 20,
+            "title": "Workload Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workload_token"
+        ],
+        "title": "AttestRequest",
+        "type": "object"
+      },
+      "AuthorizationDecision": {
+        "properties": {
+          "action": {
+            "title": "Action",
+            "type": "string"
+          },
+          "agent": {
+            "title": "Agent",
+            "type": "string"
+          },
+          "decision": {
+            "$ref": "#/components/schemas/Decision"
+          },
+          "delegation_chain": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Delegation Chain",
+            "type": "array"
+          },
+          "matched_rules": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Matched Rules",
+            "type": "array"
+          },
+          "policy_digest": {
+            "title": "Policy Digest",
+            "type": "string"
+          },
+          "policy_version": {
+            "title": "Policy Version",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "resource": {
+            "title": "Resource",
+            "type": "string"
+          }
+        },
+        "required": [
+          "decision",
+          "agent",
+          "action",
+          "resource",
+          "matched_rules",
+          "policy_version",
+          "policy_digest",
+          "reason",
+          "delegation_chain"
+        ],
+        "title": "AuthorizationDecision",
+        "type": "object"
+      },
+      "AuthorizeRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Action",
+            "type": "string"
+          },
+          "environment": {
+            "additionalProperties": true,
+            "title": "Environment",
+            "type": "object"
+          },
+          "resource_attributes": {
+            "additionalProperties": true,
+            "title": "Resource Attributes",
+            "type": "object"
+          },
+          "resource_classification": {
+            "$ref": "#/components/schemas/DataClassification",
+            "default": 1
+          },
+          "resource_id": {
+            "default": "*",
+            "maxLength": 500,
+            "title": "Resource Id",
+            "type": "string"
+          },
+          "resource_type": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Resource Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "resource_type"
+        ],
+        "title": "AuthorizeRequest",
+        "type": "object"
+      },
+      "Body_introspect_oauth2_introspect_post": {
+        "properties": {
+          "token": {
+            "title": "Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "title": "Body_introspect_oauth2_introspect_post",
+        "type": "object"
+      },
+      "Body_revoke_oauth2_revoke_post": {
+        "properties": {
+          "token": {
+            "title": "Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "title": "Body_revoke_oauth2_revoke_post",
+        "type": "object"
+      },
+      "Body_token_oauth2_token_post": {
+        "properties": {
+          "actor_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor Token"
+          },
+          "actor_token_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor Token Type"
+          },
+          "assertion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assertion"
+          },
+          "client_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Id"
+          },
+          "grant_type": {
+            "title": "Grant Type",
+            "type": "string"
+          },
+          "scope": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scope"
+          },
+          "subject_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject Token"
+          },
+          "subject_token_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject Token Type"
+          }
+        },
+        "required": [
+          "grant_type"
+        ],
+        "title": "Body_token_oauth2_token_post",
+        "type": "object"
+      },
+      "DataClassification": {
+        "description": "Sensitivity label. Ordered from least to most restricted.",
+        "enum": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "title": "DataClassification",
+        "type": "integer"
+      },
+      "Decision": {
+        "description": "Outcome of a policy or security evaluation.",
+        "enum": [
+          "allow",
+          "deny",
+          "require_approval"
+        ],
+        "title": "Decision",
+        "type": "string"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "Introspection": {
+        "description": "RFC 7662 response. Inactive tokens carry only ``active: false``.",
+        "properties": {
+          "act": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Act"
+          },
+          "active": {
+            "title": "Active",
+            "type": "boolean"
+          },
+          "agent_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Status"
+          },
+          "aud": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aud"
+          },
+          "exp": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exp"
+          },
+          "iat": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Iat"
+          },
+          "iss": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Iss"
+          },
+          "jti": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Jti"
+          },
+          "scope": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scope"
+          },
+          "sub": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sub"
+          }
+        },
+        "required": [
+          "active"
+        ],
+        "title": "Introspection",
+        "type": "object"
+      },
+      "IssuedToken": {
+        "properties": {
+          "access_token": {
+            "title": "Access Token",
+            "type": "string"
+          },
+          "expires_in": {
+            "title": "Expires In",
+            "type": "integer"
+          },
+          "issued_token_type": {
+            "default": "urn:ietf:params:oauth:token-type:jwt",
+            "title": "Issued Token Type",
+            "type": "string"
+          },
+          "scope": {
+            "title": "Scope",
+            "type": "string"
+          },
+          "token_type": {
+            "default": "Bearer",
+            "title": "Token Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "access_token",
+          "expires_in",
+          "scope"
+        ],
+        "title": "IssuedToken",
+        "type": "object"
+      },
+      "RegisterAgent": {
+        "additionalProperties": false,
+        "properties": {
+          "display_name": {
+            "maxLength": 120,
+            "minLength": 3,
+            "title": "Display Name",
+            "type": "string"
+          },
+          "mandate": {
+            "$ref": "#/components/schemas/AgentMandate"
+          },
+          "max_classification": {
+            "$ref": "#/components/schemas/DataClassification"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "namespace": {
+            "title": "Namespace",
+            "type": "string"
+          },
+          "risk": {
+            "$ref": "#/components/schemas/RiskLevel"
+          },
+          "scopes": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Scopes",
+            "type": "array",
+            "uniqueItems": true
+          },
+          "workload": {
+            "$ref": "#/components/schemas/WorkloadBinding"
+          }
+        },
+        "required": [
+          "namespace",
+          "name",
+          "display_name",
+          "mandate",
+          "scopes",
+          "risk",
+          "max_classification",
+          "workload"
+        ],
+        "title": "RegisterAgent",
+        "type": "object"
+      },
+      "RiskLevel": {
+        "description": "Action risk tier. Ordered so policies can compare with ``>=``.",
+        "enum": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "title": "RiskLevel",
+        "type": "integer"
+      },
+      "StatusChange": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "maxLength": 500,
+            "minLength": 5,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "StatusChange",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "WorkloadBinding": {
+        "description": "Which runtime workload may claim this agent identity.",
+        "properties": {
+          "audience": {
+            "description": "Audience the projected token must carry",
+            "title": "Audience",
+            "type": "string"
+          },
+          "image_digests": {
+            "default": [],
+            "description": "Allowed sha256 image digests; empty disables the check",
+            "items": {
+              "type": "string"
+            },
+            "title": "Image Digests",
+            "type": "array",
+            "uniqueItems": true
+          },
+          "issuer": {
+            "description": "Workload token issuer, e.g. the cluster OIDC issuer URL",
+            "title": "Issuer",
+            "type": "string"
+          },
+          "subject": {
+            "description": "e.g. system:serviceaccount:<namespace>:<name>",
+            "title": "Subject",
+            "type": "string"
+          }
+        },
+        "required": [
+          "issuer",
+          "subject",
+          "audience"
+        ],
+        "title": "WorkloadBinding",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "Registration, workload attestation, short-lived credentials, delegation, authorization and revocation for enterprise AI agents.",
+    "title": "Agent Identity Fabric",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/.well-known/jwks.json": {
+      "get": {
+        "operationId": "jwks__well_known_jwks_json_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Jwks  Well Known Jwks Json Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Jwks",
+        "tags": [
+          "discovery"
+        ]
+      }
+    },
+    "/.well-known/oauth-authorization-server": {
+      "get": {
+        "operationId": "metadata__well_known_oauth_authorization_server_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Metadata  Well Known Oauth Authorization Server Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Metadata",
+        "tags": [
+          "discovery"
+        ]
+      }
+    },
+    "/oauth2/introspect": {
+      "post": {
+        "operationId": "introspect_oauth2_introspect_post",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_introspect_oauth2_introspect_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Introspection"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Introspect",
+        "tags": [
+          "oauth"
+        ]
+      }
+    },
+    "/oauth2/revoke": {
+      "post": {
+        "description": "A valid agent may revoke tokens; the caller is recorded in the audit trail.",
+        "operationId": "revoke_oauth2_revoke_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_revoke_oauth2_revoke_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Revoke Oauth2 Revoke Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Revoke",
+        "tags": [
+          "oauth"
+        ]
+      }
+    },
+    "/oauth2/token": {
+      "post": {
+        "operationId": "token_oauth2_token_post",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_token_oauth2_token_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuedToken"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Token",
+        "tags": [
+          "oauth"
+        ]
+      }
+    },
+    "/v1/agents": {
+      "get": {
+        "operationId": "list_agents_v1_agents_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/AgentStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentList"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Agents",
+        "tags": [
+          "registry"
+        ]
+      },
+      "post": {
+        "operationId": "register_agent_v1_agents_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterAgent"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Register Agent",
+        "tags": [
+          "registry"
+        ]
+      }
+    },
+    "/v1/agents/{agent_uri}": {
+      "get": {
+        "operationId": "get_agent_v1_agents__agent_uri__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "agent_uri",
+            "required": true,
+            "schema": {
+              "title": "Agent Uri",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Agent",
+        "tags": [
+          "registry"
+        ]
+      }
+    },
+    "/v1/attest": {
+      "post": {
+        "description": "Called by the agent workload itself; authenticated by the workload token.",
+        "operationId": "attest_v1_attest_post",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "agent_uri",
+            "required": true,
+            "schema": {
+              "minLength": 10,
+              "title": "Agent Uri",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Attest",
+        "tags": [
+          "registry"
+        ]
+      }
+    },
+    "/v1/authorize": {
+      "post": {
+        "operationId": "authorize_v1_authorize_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthorizeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthorizationDecision"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Authorize",
+        "tags": [
+          "authorization"
+        ]
+      }
+    },
+    "/v1/reinstate": {
+      "post": {
+        "operationId": "reinstate_v1_reinstate_post",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "agent_uri",
+            "required": true,
+            "schema": {
+              "minLength": 10,
+              "title": "Agent Uri",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatusChange"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reinstate",
+        "tags": [
+          "registry"
+        ]
+      }
+    },
+    "/v1/revoke-agent": {
+      "post": {
+        "operationId": "revoke_agent_v1_revoke_agent_post",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "agent_uri",
+            "required": true,
+            "schema": {
+              "minLength": 10,
+              "title": "Agent Uri",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatusChange"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Revoke Agent",
+        "tags": [
+          "registry"
+        ]
+      }
+    },
+    "/v1/suspend": {
+      "post": {
+        "operationId": "suspend_v1_suspend_post",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "agent_uri",
+            "required": true,
+            "schema": {
+              "minLength": 10,
+              "title": "Agent Uri",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatusChange"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Suspend",
+        "tags": [
+          "registry"
+        ]
+      }
+    }
+  }
+}

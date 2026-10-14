@@ -1,0 +1,58 @@
+{
+  "$defs": {
+    "DataClassification": {
+      "description": "Sensitivity label. Ordered from least to most restricted.",
+      "enum": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "title": "DataClassification",
+      "type": "integer"
+    }
+  },
+  "$id": "https://github.com/kogunlowo123/agent-identity-fabric/schemas/authorize.request.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "action": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Action",
+      "type": "string"
+    },
+    "environment": {
+      "additionalProperties": true,
+      "title": "Environment",
+      "type": "object"
+    },
+    "resource_attributes": {
+      "additionalProperties": true,
+      "title": "Resource Attributes",
+      "type": "object"
+    },
+    "resource_classification": {
+      "$ref": "#/$defs/DataClassification",
+      "default": 1
+    },
+    "resource_id": {
+      "default": "*",
+      "maxLength": 500,
+      "title": "Resource Id",
+      "type": "string"
+    },
+    "resource_type": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Resource Type",
+      "type": "string"
+    }
+  },
+  "required": [
+    "action",
+    "resource_type"
+  ],
+  "title": "AuthorizeRequest",
+  "type": "object"
+}

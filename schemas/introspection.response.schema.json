@@ -1,0 +1,125 @@
+{
+  "$id": "https://github.com/kogunlowo123/agent-identity-fabric/schemas/introspection.response.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "RFC 7662 response. Inactive tokens carry only ``active: false``.",
+  "properties": {
+    "act": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Act"
+    },
+    "active": {
+      "title": "Active",
+      "type": "boolean"
+    },
+    "agent_status": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Agent Status"
+    },
+    "aud": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Aud"
+    },
+    "exp": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Exp"
+    },
+    "iat": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Iat"
+    },
+    "iss": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Iss"
+    },
+    "jti": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Jti"
+    },
+    "scope": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Scope"
+    },
+    "sub": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Sub"
+    }
+  },
+  "required": [
+    "active"
+  ],
+  "title": "Introspection",
+  "type": "object"
+}

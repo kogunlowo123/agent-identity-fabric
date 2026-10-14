@@ -1,0 +1,72 @@
+# PrometheusRule-compatible alert rules. Load with the Prometheus Operator
+# (kubectl apply after wrapping in a PrometheusRule) or a rule_files entry.
+# SLOs (docs/architecture/agent-specification.md):
+#   availability  99.95% of token and authorization requests succeed (non-5xx)
+#   latency       p99 /v1/authorize < 100 ms, p99 /oauth2/token < 250 ms
+groups:
+  - name: agent-identity-fabric.slo
+    rules:
+      - record: fabric:request_errors:ratio_5m
+        expr: |
+          sum(rate(fabric_http_request_duration_seconds_count{status=~"5.."}[5m]))
+          /
+          clamp_min(sum(rate(fabric_http_request_duration_seconds_count[5m])), 1e-9)
+
+      - alert: FabricErrorBudgetBurnFast
+        expr: fabric:request_errors:ratio_5m > (14.4 * 0.0005)
+        for: 5m
+        labels: {severity: page}
+        annotations:
+          summary: Identity fabric burning error budget 14x faster than sustainable
+          runbook: docs/runbooks/incident-response.md#elevated-5xx
+
+      - alert: FabricAuthorizeLatencyHigh
+        expr: |
+          histogram_quantile(0.99, sum by (le) (
+            rate(fabric_http_request_duration_seconds_bucket{route="/v1/authorize"}[5m])
+          )) > 0.1
+        for: 10m
+        labels: {severity: ticket}
+        annotations:
+          summary: p99 /v1/authorize above 100 ms
+          runbook: docs/runbooks/monitoring.md#latency
+
+      - alert: FabricTokenLatencyHigh
+        expr: |
+          histogram_quantile(0.99, sum by (le) (
+            rate(fabric_http_request_duration_seconds_bucket{route="/oauth2/token"}[5m])
+          )) > 0.25
+        for: 10m
+        labels: {severity: ticket}
+        annotations:
+          summary: p99 /oauth2/token above 250 ms
+          runbook: docs/runbooks/monitoring.md#latency
+
+  - name: agent-identity-fabric.security
+    rules:
+      - alert: FabricAttestationFailureSpike
+        expr: sum(rate(fabric_token_failures_total{error="invalid_grant"}[10m])) > 0.5
+        for: 10m
+        labels: {severity: page}
+        annotations:
+          summary: Sustained rejected credential requests; possible impersonation attempt
+          runbook: docs/runbooks/incident-response.md#attestation-failures
+
+      - alert: FabricDenySpike
+        expr: |
+          sum(rate(fabric_authorization_decisions_total{decision="deny"}[10m]))
+          /
+          clamp_min(sum(rate(fabric_authorization_decisions_total[10m])), 1e-9) > 0.2
+        for: 15m
+        labels: {severity: ticket}
+        annotations:
+          summary: More than 20% of authorization decisions are denials
+          runbook: docs/runbooks/incident-response.md#deny-spike
+
+      - alert: FabricNotReady
+        expr: sum(up{job="agent-identity-fabric"}) < 2
+        for: 5m
+        labels: {severity: page}
+        annotations:
+          summary: Fewer than two fabric replicas are being scraped
+          runbook: docs/runbooks/incident-response.md#replicas-down

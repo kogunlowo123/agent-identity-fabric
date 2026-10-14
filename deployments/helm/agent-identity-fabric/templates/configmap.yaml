@@ -1,0 +1,27 @@
+{{- $f := .Values.fabric -}}
+{{- if not $f.workloadIssuers }}{{ fail "fabric.workloadIssuers is required" }}{{ end -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "fabric.fullname" . }}
+  labels: {{- include "fabric.labels" . | nindent 4 }}
+data:
+  FABRIC_ENVIRONMENT: {{ $f.environment | quote }}
+  FABRIC_TRUST_DOMAIN: {{ required "fabric.trustDomain is required" $f.trustDomain | quote }}
+  FABRIC_ISSUER: {{ required "fabric.issuer is required" $f.issuer | quote }}
+  FABRIC_AUDIENCE: {{ $f.audience | quote }}
+  FABRIC_ACTIVE_KID: {{ required "fabric.activeKid is required" $f.activeKid | quote }}
+  FABRIC_SIGNING_KEYS_DIR: /etc/identity-fabric/signing-keys
+  FABRIC_AUDIT_KEY_FILE: {{ printf "/etc/identity-fabric/audit-key/%s" (required "secrets.auditKeyFile is required" .Values.secrets.auditKeyFile) | quote }}
+  FABRIC_WORKLOAD_ISSUERS: {{ $f.workloadIssuers | toJson | quote }}
+  FABRIC_ADMIN_ISSUER: {{ required "fabric.admin.issuer is required" $f.admin.issuer | quote }}
+  FABRIC_ADMIN_AUDIENCE: {{ required "fabric.admin.audience is required" $f.admin.audience | quote }}
+  FABRIC_ADMIN_JWKS_URL: {{ required "fabric.admin.jwksUrl is required" $f.admin.jwksUrl | quote }}
+  FABRIC_ADMIN_ROLES_CLAIM: {{ $f.admin.rolesClaim | quote }}
+  FABRIC_TOKEN_TTL_SECONDS: {{ $f.tokenTtlSeconds | quote }}
+  FABRIC_MAX_TOKEN_TTL_SECONDS: {{ $f.maxTokenTtlSeconds | quote }}
+  FABRIC_MAX_DELEGATION_DEPTH: {{ $f.maxDelegationDepth | quote }}
+  FABRIC_LOG_LEVEL: {{ $f.logLevel | quote }}
+  {{- with $f.otlpEndpoint }}
+  FABRIC_OTLP_ENDPOINT: {{ . | quote }}
+  {{- end }}

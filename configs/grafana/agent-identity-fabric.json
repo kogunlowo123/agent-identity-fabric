@@ -1,0 +1,51 @@
+{
+  "title": "Agent Identity Fabric",
+  "uid": "agent-identity-fabric",
+  "schemaVersion": 39,
+  "time": {"from": "now-6h", "to": "now"},
+  "templating": {
+    "list": [
+      {"name": "datasource", "type": "datasource", "query": "prometheus"}
+    ]
+  },
+  "panels": [
+    {
+      "id": 1, "type": "stat", "title": "Request success (5m)",
+      "gridPos": {"x": 0, "y": 0, "w": 6, "h": 4},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "fieldConfig": {"defaults": {"unit": "percentunit", "decimals": 3}},
+      "targets": [{"expr": "1 - fabric:request_errors:ratio_5m"}]
+    },
+    {
+      "id": 2, "type": "timeseries", "title": "Credentials issued by grant",
+      "gridPos": {"x": 6, "y": 0, "w": 9, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"expr": "sum by (grant) (rate(fabric_tokens_issued_total[5m]))", "legendFormat": "{{grant}}"}]
+    },
+    {
+      "id": 3, "type": "timeseries", "title": "Rejected credential requests",
+      "gridPos": {"x": 15, "y": 0, "w": 9, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"expr": "sum by (grant, error) (rate(fabric_token_failures_total[5m]))", "legendFormat": "{{grant}} {{error}}"}]
+    },
+    {
+      "id": 4, "type": "timeseries", "title": "Authorization decisions",
+      "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"expr": "sum by (decision) (rate(fabric_authorization_decisions_total[5m]))", "legendFormat": "{{decision}}"}]
+    },
+    {
+      "id": 5, "type": "timeseries", "title": "p99 latency by route",
+      "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "fieldConfig": {"defaults": {"unit": "s"}},
+      "targets": [{"expr": "histogram_quantile(0.99, sum by (le, route) (rate(fabric_http_request_duration_seconds_bucket[5m])))", "legendFormat": "{{route}}"}]
+    },
+    {
+      "id": 6, "type": "timeseries", "title": "Agent lifecycle events",
+      "gridPos": {"x": 0, "y": 16, "w": 24, "h": 7},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"expr": "sum by (event) (increase(fabric_agent_lifecycle_events_total[1h]))", "legendFormat": "{{event}}"}]
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "$defs": {
+    "Decision": {
+      "description": "Outcome of a policy or security evaluation.",
+      "enum": [
+        "allow",
+        "deny",
+        "require_approval"
+      ],
+      "title": "Decision",
+      "type": "string"
+    }
+  },
+  "$id": "https://github.com/kogunlowo123/agent-identity-fabric/schemas/authorization-decision.response.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "action": {
+      "title": "Action",
+      "type": "string"
+    },
+    "agent": {
+      "title": "Agent",
+      "type": "string"
+    },
+    "decision": {
+      "$ref": "#/$defs/Decision"
+    },
+    "delegation_chain": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Delegation Chain",
+      "type": "array"
+    },
+    "matched_rules": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Matched Rules",
+      "type": "array"
+    },
+    "policy_digest": {
+      "title": "Policy Digest",
+      "type": "string"
+    },
+    "policy_version": {
+      "title": "Policy Version",
+      "type": "string"
+    },
+    "reason": {
+      "title": "Reason",
+      "type": "string"
+    },
+    "resource": {
+      "title": "Resource",
+      "type": "string"
+    }
+  },
+  "required": [
+    "decision",
+    "agent",
+    "action",
+    "resource",
+    "matched_rules",
+    "policy_version",
+    "policy_digest",
+    "reason",
+    "delegation_chain"
+  ],
+  "title": "AuthorizationDecision",
+  "type": "object"
+}

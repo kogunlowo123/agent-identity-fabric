@@ -1,0 +1,105 @@
+replicaCount: 3
+
+image:
+  repository: ghcr.io/kogunlowo123/agent-identity-fabric
+  tag: ""  # defaults to .Chart.AppVersion
+  digest: ""  # set to pin an immutable sha256 digest; takes precedence over tag
+  pullPolicy: IfNotPresent
+
+serviceAccount:
+  create: true
+  name: agent-identity-fabric
+  # Cloud workload identity bindings, e.g.
+  #   eks.amazonaws.com/role-arn (AWS IRSA)
+  #   azure.workload.identity/client-id (Azure Workload ID)
+  #   iam.gke.io/gcp-service-account (GKE Workload Identity)
+  annotations: {}
+
+podLabels: {}
+
+# Deployment-specific values marked REQUIRED have no default; the chart
+# refuses to render until they are set (helm install --values <env>.yaml).
+fabric:
+  environment: production
+  trustDomain: ""  # REQUIRED: SPIFFE trust domain
+  issuer: ""  # REQUIRED: public HTTPS URL of this fabric
+  audience: agent-platform
+  activeKid: ""  # REQUIRED: kid of the active signing key in secrets.signingKeys
+  logLevel: INFO
+  tokenTtlSeconds: 600
+  maxTokenTtlSeconds: 900
+  maxDelegationDepth: 3
+  # REQUIRED: trusted workload token issuer URL -> JWKS URL (e.g. the cluster
+  # OIDC issuer from `kubectl get --raw /.well-known/openid-configuration`).
+  workloadIssuers: {}
+  admin:
+    issuer: ""  # REQUIRED: enterprise OIDC issuer
+    audience: ""  # REQUIRED: audience of administrator tokens
+    jwksUrl: ""  # REQUIRED: JWKS URL of the enterprise OIDC issuer
+    rolesClaim: roles
+  otlpEndpoint: ""  # optional OTLP gRPC endpoint
+
+# Secrets are created by the platform secret operator (External Secrets,
+# Secrets Store CSI) from the cloud secret manager provisioned by Terraform.
+secrets:
+  # Secret holding key DATABASE_URL (postgresql+asyncpg://...).
+  database: agent-identity-fabric-database
+  # Secret holding one <kid>.pem Ed25519 private key per signing key.
+  signingKeys: agent-identity-fabric-signing-keys
+  # Secret holding audit-<kid>.pem, the Ed25519 audit signing key.
+  auditKey: agent-identity-fabric-audit-key
+  auditKeyFile: ""  # REQUIRED: file name of the audit key within secrets.auditKey
+
+audit:
+  storageClassName: ""
+  size: 20Gi
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  host: ""  # required when ingress.enabled
+  tlsSecret: agent-identity-fabric-tls
+  annotations: {}
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 256Mi
+  limits:
+    cpu: "1"
+    memory: 512Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 12
+  targetCPUUtilizationPercentage: 70
+
+podDisruptionBudget:
+  minAvailable: 2
+
+networkPolicy:
+  enabled: true
+  # Namespaces whose pods may call the fabric.
+  allowedNamespaceLabels:
+    agent-platform/member: "true"
+  # Namespace label of the Prometheus / ingress namespaces.
+  monitoringNamespaceLabels:
+    kubernetes.io/metadata.name: observability
+  ingressNamespaceLabels:
+    kubernetes.io/metadata.name: ingress-nginx
+
+serviceMonitor:
+  enabled: false
+  interval: 30s
+
+nodeSelector: {}
+tolerations: []
+topologySpreadConstraints:
+  - maxSkew: 1
+    topologyKey: topology.kubernetes.io/zone
+    whenUnsatisfiable: ScheduleAnyway

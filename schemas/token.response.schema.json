@@ -1,0 +1,35 @@
+{
+  "$id": "https://github.com/kogunlowo123/agent-identity-fabric/schemas/token.response.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "access_token": {
+      "title": "Access Token",
+      "type": "string"
+    },
+    "expires_in": {
+      "title": "Expires In",
+      "type": "integer"
+    },
+    "issued_token_type": {
+      "default": "urn:ietf:params:oauth:token-type:jwt",
+      "title": "Issued Token Type",
+      "type": "string"
+    },
+    "scope": {
+      "title": "Scope",
+      "type": "string"
+    },
+    "token_type": {
+      "default": "Bearer",
+      "title": "Token Type",
+      "type": "string"
+    }
+  },
+  "required": [
+    "access_token",
+    "expires_in",
+    "scope"
+  ],
+  "title": "IssuedToken",
+  "type": "object"
+}

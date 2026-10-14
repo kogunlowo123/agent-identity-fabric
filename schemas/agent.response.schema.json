@@ -1,0 +1,186 @@
+{
+  "$defs": {
+    "AgentMandate": {
+      "description": "Role, mission and operating boundaries recorded at registration.",
+      "properties": {
+        "business_owner": {
+          "minLength": 3,
+          "title": "Business Owner",
+          "type": "string"
+        },
+        "disallowed_actions": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Disallowed Actions",
+          "type": "array"
+        },
+        "escalation_contact": {
+          "minLength": 3,
+          "title": "Escalation Contact",
+          "type": "string"
+        },
+        "mission": {
+          "maxLength": 2000,
+          "minLength": 10,
+          "title": "Mission",
+          "type": "string"
+        },
+        "protected_resources": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Protected Resources",
+          "type": "array"
+        },
+        "technical_owner": {
+          "minLength": 3,
+          "title": "Technical Owner",
+          "type": "string"
+        }
+      },
+      "required": [
+        "mission",
+        "business_owner",
+        "technical_owner",
+        "escalation_contact"
+      ],
+      "title": "AgentMandate",
+      "type": "object"
+    },
+    "AgentStatus": {
+      "enum": [
+        "pending",
+        "active",
+        "suspended",
+        "revoked"
+      ],
+      "title": "AgentStatus",
+      "type": "string"
+    },
+    "WorkloadBinding": {
+      "description": "Which runtime workload may claim this agent identity.",
+      "properties": {
+        "audience": {
+          "description": "Audience the projected token must carry",
+          "title": "Audience",
+          "type": "string"
+        },
+        "image_digests": {
+          "default": [],
+          "description": "Allowed sha256 image digests; empty disables the check",
+          "items": {
+            "type": "string"
+          },
+          "title": "Image Digests",
+          "type": "array",
+          "uniqueItems": true
+        },
+        "issuer": {
+          "description": "Workload token issuer, e.g. the cluster OIDC issuer URL",
+          "title": "Issuer",
+          "type": "string"
+        },
+        "subject": {
+          "description": "e.g. system:serviceaccount:<namespace>:<name>",
+          "title": "Subject",
+          "type": "string"
+        }
+      },
+      "required": [
+        "issuer",
+        "subject",
+        "audience"
+      ],
+      "title": "WorkloadBinding",
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/kogunlowo123/agent-identity-fabric/schemas/agent.response.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "agent_id": {
+      "title": "Agent Id",
+      "type": "string"
+    },
+    "attested_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Attested At"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "display_name": {
+      "title": "Display Name",
+      "type": "string"
+    },
+    "mandate": {
+      "$ref": "#/$defs/AgentMandate"
+    },
+    "max_classification": {
+      "title": "Max Classification",
+      "type": "integer"
+    },
+    "risk": {
+      "title": "Risk",
+      "type": "integer"
+    },
+    "scopes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Scopes",
+      "type": "array"
+    },
+    "status": {
+      "$ref": "#/$defs/AgentStatus"
+    },
+    "status_reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Status Reason"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    },
+    "workload": {
+      "$ref": "#/$defs/WorkloadBinding"
+    }
+  },
+  "required": [
+    "agent_id",
+    "display_name",
+    "status",
+    "scopes",
+    "risk",
+    "max_classification",
+    "mandate",
+    "workload",
+    "created_at",
+    "updated_at",
+    "attested_at",
+    "status_reason"
+  ],
+  "title": "AgentView",
+  "type": "object"
+}
